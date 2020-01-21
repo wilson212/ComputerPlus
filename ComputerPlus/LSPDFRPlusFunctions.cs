@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Rage;
-using LSPD_First_Response.Engine.Scripting.Entities;
+﻿using LSPD_First_Response.Engine.Scripting.Entities;
 using LSPDFR_;
 using LSPDFR_.API;
+using Rage;
+using System;
+using System.Collections.Generic;
 
 namespace ComputerPlus
 {
-
     public static class LSPDFRPlusFunctions
     {
 

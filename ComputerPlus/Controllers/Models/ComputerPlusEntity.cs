@@ -124,7 +124,7 @@ namespace ComputerPlus.Controllers.Models
                 switch (PersonaType)
                 {
                     case PersonaTypes.BPS: return BritishPolicingFunctions.GetPedPersonaDOBString(PedPersona);
-                    default: return PedPersona.BirthDay.ToDateTimeString(Extensions.Gwen.TextBoxExtensions.DateOutputPart.DATE, false);
+                    default: return PedPersona.Birthday.ToDateTimeString(Extensions.Gwen.TextBoxExtensions.DateOutputPart.DATE, false);
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace ComputerPlus.Controllers.Models
                 switch (PersonaType)
                 {
                     case PersonaTypes.BPS: birthDate = BritishPolicingFunctions.GetPedPersonaBirthDay(PedPersona); break;
-                    default: birthDate = PedPersona.BirthDay; break;
+                    default: birthDate = PedPersona.Birthday; break;
                 }
                 return  (int)((DateTime.Today - birthDate).Days / 365.25m);
             }

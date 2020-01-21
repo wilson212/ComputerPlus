@@ -61,10 +61,12 @@ namespace ComputerPlus.Extensions
 
             foreach (var item in separatedLines)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 FormattedText formatted = new FormattedText(item,
                      CultureInfo.GetCultureInfo("en-us"),
                      System.Windows.FlowDirection.LeftToRight,
-                     new Typeface(fontFamily), emSize, System.Windows.Media.Brushes.Black);
+                     new Typeface(fontFamily), emSize, Brushes.Black);
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 actualLine.Append(item + " ");
                 actualWidth += formatted.Width;

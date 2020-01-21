@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Stealth.Plugins.ALPRPlus;
+﻿using ComputerPlus.Controllers.Models;
+using Rage;
 using Stealth.Plugins.ALPRPlus.API;
 using Stealth.Plugins.ALPRPlus.API.Types;
-using Rage;
-using ComputerPlus.Interfaces.ComputerVehDB;
 using Stealth.Plugins.ALPRPlus.API.Types.Enums;
-using ComputerPlus.Controllers.Models;
+using System;
 
-namespace ComputerPlus { 
-
-   
-    
+namespace ComputerPlus
+{
     internal static class ALPRPlusFunctions
     {
         internal static event EventHandler<ALPR_Arguments> OnAlprPlusMessage;

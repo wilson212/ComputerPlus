@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ComputerPlus</RootNamespace>
     <AssemblyName>ComputerPlus</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -43,6 +43,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -55,6 +56,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AgencyCalloutsPlus">
+      <HintPath>..\..\AgencyCallouts\AgencyCalloutsPlus\bin\x64\Debug\AgencyCalloutsPlus.dll</HintPath>
+    </Reference>
     <Reference Include="ALPRPlus, Version=0.2.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Dependencies\ALPRPlus.dll</HintPath>
@@ -73,8 +77,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="LSPD First Response">
-      <HintPath>Dependencies\LSPD First Response.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\__Dependencies\v1737\LSPD First Response.dll</HintPath>
     </Reference>
     <Reference Include="LSPDFR+, Version=1.6.5.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -83,12 +86,13 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="RagePluginHook">
-      <HintPath>Dependencies\RagePluginHook.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="RagePluginHookSDK">
+      <HintPath>..\..\__Dependencies\v1737\RagePluginHookSDK.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <Reference Include="System">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -135,6 +139,13 @@
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="FriendlyKeys.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="Interfaces\AgencyDispatchCallDetails\AgencyDispatchCallDetails.cs" />
+    <Compile Include="Interfaces\AgencyDispatchCallDetails\AgencyDispatchCallDetailsTemplate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Interfaces\AgencyDispatchCallDetails\AgencyDispatchCallDetailsTemplate.Designer.cs">
+      <DependentUpon>AgencyDispatchCallDetailsTemplate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Interfaces\Common\ActionDialog.cs" />
     <Compile Include="Interfaces\Common\DateInputBox.cs" />
     <Compile Include="Interfaces\Common\FormSection.cs" />
@@ -288,6 +299,9 @@
     <Compile Include="XmlConfigs.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Interfaces\AgencyDispatchCallDetails\AgencyDispatchCallDetailsTemplate.resx">
+      <DependentUpon>AgencyDispatchCallDetailsTemplate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Interfaces\ComputerCurrentCallDetails\ComputerHelpDialogTemplate.resx">
       <DependentUpon>ComputerHelpDialogTemplate.cs</DependentUpon>
     </EmbeddedResource>
@@ -352,23 +366,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(TargetDir)ComputerPlus.dll" "$(TargetDir)Packaged\GTA V Main Folder\Plugins\LSPDFR\"
-xcopy /Y "$(TargetDir)ComputerPlus.pdb" "$(TargetDir)Packaged\GTA V Main Folder\Plugins\LSPDFR\"
-xcopy /Y "$(ProjectDir)Resources\*.dll" "$(TargetDir)Packaged\GTA V Main Folder\"
-xcopy /Y "$(ProjectDir)Resources\*.jpg" "$(TargetDir)Packaged\GTA V Main Folder\Plugins\LSPDFR\ComputerPlus\"
-xcopy /Y "$(ProjectDir)Resources\*.xml" "$(TargetDir)Packaged\GTA V Main Folder\Plugins\LSPDFR\ComputerPlus\"
-copy /Y "$(ProjectDir)..\README.md" "$(TargetDir)Packaged\readme.txt"
-
-xcopy /Y "$(ProjectDir)Resources\*.png" "$(TargetDir)Packaged\GTA V Main Folder\Plugins\LSPDFR\ComputerPlus\"
-xcopy /Y "$(ProjectDir)Resources\icons\*.png" "$(TargetDir)Packaged\GTA V Main Folder\Plugins\LSPDFR\ComputerPlus\icons\"
-xcopy /Y "$(ProjectDir)Resources\backgrounds\*.jpg" "$(TargetDir)Packaged\GTA V Main Folder\Plugins\LSPDFR\ComputerPlus\backgrounds\"
-
-xcopy /Y "$(ProjectDir)Resources\ComputerPlus.ini" "$(TargetDir)Packaged\GTA V Main Folder\Plugins\LSPDFR\"
-
-
-xcopy /Y "$(TargetDir)ComputerPlus.dll" "D:\Games\Grand Theft Auto V\Plugins\LSPDFR"
-
-xcopy /Y "$(TargetDir)ComputerPlus.pdb" "D:\Games\Grand Theft Auto V\Plugins\LSPDFR"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

@@ -479,6 +479,11 @@ namespace ComputerPlus
             return IsLSPDFRPluginRunning("LSPDFR+", new Version(1, 6, 5, 0));
         }
 
+        internal static bool IsDispatchPlusRunning()
+        {
+            return IsLSPDFRPluginRunning("AgencyCalloutsPlus", new Version(1, 0, 0, 0));
+        }
+
         internal static string GetFormattedDateTime(DateTime? date = null)
         {
             if (date == null || !date.HasValue)

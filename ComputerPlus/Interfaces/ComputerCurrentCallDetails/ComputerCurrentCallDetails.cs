@@ -1,36 +1,36 @@
-﻿using ComputerPlus.API;
+﻿using AgencyCalloutsPlus.API;
+using ComputerPlus.API;
 using ComputerPlus.Extensions;
-using System;
-using System.Threading;
-using System.Drawing;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Linq;
+using Gwen.Control;
 using Rage;
 using Rage.Forms;
-using Gwen.Control;
-using LSPD_First_Response.Engine.Scripting.Entities;
-using LSPD_First_Response.Mod.API;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 namespace ComputerPlus
 {
     internal class ComputerCurrentCallDetails : GwenForm
     {
         private Button btn_help;
-        private ListBox list_calls;
+        private ListBox list_prev_calls, list_active_calls;
         private Label lbl_c_unit, lbl_c_time, lbl_c_status, lbl_c_call;
+        private Label lbl_ac_unit, lbl_ac_time, lbl_ac_status, lbl_ac_location, lbl_ac_priority, lbl_ac_type, lbl_ac_callnum;
         private Label lbl_a_id, lbl_a_time, lbl_a_call, lbl_a_loc, lbl_a_stat, lbl_a_unit, lbl_a_resp,
             lbl_a_desc, lbl_a_peds, lbl_a_vehs;
         private TextBox out_id, out_date, out_time, out_call, out_loc, out_stat, out_unit, out_resp;
         private MultilineTextBox out_desc, out_peds, out_vehs;
-        private Base base_calls, base_active;
+        private Base base_calls, base_active, base_active_calls;
         private TabControl tc_main;
-        //internal static GameFiber form_main = new GameFiber(OpenMainMenuForm),
-       //     diag_help = new GameFiber(OpenHelpDialog);
+
+        public ListBoxRow SelectedRow { get; private set; }
+
+        internal GameFiber diag_help;
 
         public ComputerCurrentCallDetails() : base(typeof(ComputerCurrentCallDetailsTemplate))
         {
-
+            diag_help = new GameFiber(OpenHelpDialog);
         }
 
         public override void InitializeLayout()
@@ -48,18 +48,71 @@ namespace ComputerPlus
             /***** Main Tab Control *****/
             tc_main = new TabControl(this);
             tc_main.SetPosition(15, 12);
-            tc_main.SetSize(625, 389);
+            tc_main.SetSize(760, 389);
 
-            /***** Call List Tab *****/
+            /***** Active Calls List Tab *****/
+            // base container
+            base_active_calls = new Base(this);
+            base_active_calls.SetPosition(0, 0);
+            base_active_calls.SetSize(753, 358);
+
+            // calls listbox
+            list_active_calls = new ListBox(base_active_calls);
+            list_active_calls.SetPosition(0, 18);
+            list_active_calls.SetSize(749, 333);
+
+            // "Call ID" label
+            lbl_ac_callnum = new Label(base_active_calls);
+            lbl_ac_callnum.Text = "Call ID";
+            lbl_ac_callnum.SetPosition(3, 1);
+            lbl_ac_callnum.SetSize(30, 13);
+
+            // "Call Type" label
+            lbl_ac_type = new Label(base_active_calls);
+            lbl_ac_type.Text = "Type";
+            lbl_ac_type.SetPosition(73, 1);
+            lbl_ac_type.SetSize(40, 13);
+
+            // "Time" label
+            lbl_ac_time = new Label(base_active_calls);
+            lbl_ac_time.Text = "Time";
+            lbl_ac_time.SetPosition(230, 1);
+            lbl_ac_time.SetSize(40, 13);
+
+            // "Priority" label
+            lbl_ac_priority = new Label(base_active_calls);
+            lbl_ac_priority.Text = "Priority";
+            lbl_ac_priority.SetPosition(345, 1);
+            lbl_ac_priority.SetSize(40, 13);
+
+            // "Status" label
+            lbl_ac_status = new Label(base_active_calls);
+            lbl_ac_status.Text = "Status";
+            lbl_ac_status.SetPosition(420, 1);
+            lbl_ac_status.SetSize(40, 13);
+
+            // "Unit" label
+            lbl_ac_unit = new Label(base_active_calls);
+            lbl_ac_unit.Text = "Assigned";
+            lbl_ac_unit.SetPosition(545, 1);
+            lbl_ac_unit.SetSize(40, 13);
+
+            // "Location" label
+            lbl_ac_location = new Label(base_active_calls);
+            lbl_ac_location.Text = "Location";
+            lbl_ac_location.SetPosition(648, 1);
+            lbl_ac_location.SetSize(40, 13);
+
+            /***** Previous Call List Tab *****/
             // base container
             base_calls = new Base(this);
             base_calls.SetPosition(0, 0);
             base_calls.SetSize(617, 358);
 
             // calls listbox
-            list_calls = new ListBox(base_calls);
-            list_calls.SetPosition(0, 18);
-            list_calls.SetSize(613, 333);
+            list_prev_calls = new ListBox(base_calls);
+            list_prev_calls.SetPosition(0, 18);
+            list_prev_calls.SetSize(613, 333);
 
             // "Unit" label
             lbl_c_unit = new Label(base_calls);
@@ -206,20 +259,60 @@ namespace ComputerPlus
             out_vehs.SetSize(523, 57);
             out_vehs.KeyboardInputEnabled = false;
 
-            // Add tabs and their corresponding containers
             // Active Call tab is hidden when no callout is active
             if (Globals.ActiveCallout != null)
                 tc_main.AddPage("Active Call", base_active);
             else
                 base_active.Hide();
-            tc_main.AddPage("Call List", base_calls);
 
-            List<CalloutData> mActiveCalls = (from CalloutData x in Globals.CallQueue orderby x.TimeReceived descending select x).ToList();
+            // Add tabs and their corresponding containers
+            if (Function.IsDispatchPlusRunning())
+            {
+                tc_main.AddPage("Active Call List", base_active_calls);
+                for (int i = 1; i < 5; i++)
+                {
+                    foreach (var call in Dispatch.GetCallList(i))
+                    {
+                        var timeSpan = World.DateTime - call.CallCreated;
+                        var row = list_active_calls.AddRow(
+                            String.Format("{0}{1}{2}{3}{4}{5}{6}",
+                                call.CallId.ToString().PadRight(12),
+                                "MVA".PadRight(32),
+                                timeSpan.ToString().PadRight(20),
+                                call.Priority.ToString().PadRight(16),
+                                call.CallStatus.ToFriendlyString().PadRight(20),
+                                call.PrimaryOfficer?.UnitString.PadRight(20) ?? " ".PadRight(25),
+                                call.Zone.ScriptName
+                            )
+                        );
 
+                        // Store call in the row
+                        row.UserData = call;
+                        row.DoubleClicked += Row_DoubleClicked;
+                    }
+                }
+            }
+
+            // Add call history page last
+            tc_main.AddPage("Call History", base_calls);
+
+            var mActiveCalls = (from CalloutData x in Globals.CallQueue orderby x.TimeReceived descending select x);
             foreach (CalloutData x in mActiveCalls)
             {
-                list_calls.AddRow(String.Format("{0}{1}{2}{3}", x.PrimaryUnit.PadRight(12), x.TimeReceived.ToLocalTime().ToString("HH:mm").PadRight(21), x.Status.ToFriendlyString().PadRight(31), x.Name.ToUpper()));
+                list_prev_calls.AddRow(String.Format("{0}{1}{2}{3}", x.PrimaryUnit.PadRight(12), x.TimeReceived.ToLocalTime().ToString("HH:mm").PadRight(21), x.Status.ToFriendlyString().PadRight(31), x.Name.ToUpper()));
             }
+        }
+
+        /// <summary>
+        /// Event fired when a call is double clicked in the Active Call List tab
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="arguments"></param>
+        private void Row_DoubleClicked(Base sender, ClickedEventArgs arguments)
+        {
+            SelectedRow = (ListBoxRow)sender;
+            diag_help = new GameFiber(OpenHelpDialog);
+            diag_help.Start();
         }
 
         private void HelpButtonClickedHandler(Base sender, ClickedEventArgs e)
@@ -228,9 +321,10 @@ namespace ComputerPlus
             diag_help.Start();*/
         }
        
-        private static void OpenHelpDialog()
+        private void OpenHelpDialog()
         {
-            GwenForm help = new ComputerHelpDialog();
+            PriorityCall call = (PriorityCall)SelectedRow.UserData;
+            GwenForm help = new AgencyDispatchCallDetails(call);
             help.Show();
             while (help.Window.IsVisible)
                 GameFiber.Yield();
